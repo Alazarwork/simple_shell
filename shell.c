@@ -44,28 +44,28 @@ static int command(int input, int first, int last)
  
 	if (pid == 0) {
 		if (first == 1 && last == 0 && input == 0) {
-			// First command
+			/* First command*/
 			dup2( pipettes[WRITE], STDOUT_FILENO );
 		} else if (first == 0 && last == 0 && input != 0) {
-			// Middle command
+			/* Middle command*/
 			dup2(input, STDIN_FILENO);
 			dup2(pipettes[WRITE], STDOUT_FILENO);
 		} else {
-			// Last command
+			/* Last command*/
 			dup2( input, STDIN_FILENO );
 		}
  
 		if (execvp( args[0], args) == -1)
-			_exit(EXIT_FAILURE); // If child fails
+			_exit(EXIT_FAILURE); /* If child fails*/
 	}
  
 	if (input != 0) 
 		close(input);
  
-	// Nothing more needs to be written
+	/* Nothing more needs to be written*/
 	close(pipettes[WRITE]);
  
-	// If it's the last command, nothing more needs to be read
+	/* If it's the last command, nothing more needs to be read*/
 	if (last == 1)
 		close(pipettes[READ]);
  
@@ -87,22 +87,20 @@ static char line[1024];
 static int n = 0; /* number of calls to 'command' */
  
 int main()
-{
+{int input = 0;
+	int first = 1;
+	char* cmd = line;
+	char* next = strchr(cmd, '|'); /* Find first '|' */
 	printf("SIMPLE SHELL: Type 'exit' or send EOF to exit.\n");
 	while (1) {
 		/* Print the command prompt */
-		printf("$> ");
+		printf("#cisfun$ ");
 		fflush(NULL);
  
 		/* Read a command line */
 		if (!fgets(line, 1024, stdin)) 
 			return 0;
  
-		int input = 0;
-		int first = 1;
- 
-		char* cmd = line;
-		char* next = strchr(cmd, '|'); /* Find first '|' */
  
 		while (next != NULL) {
 			/* 'next' points to '|' */
@@ -142,9 +140,10 @@ static char* skipwhite(char* s)
  
 static void split(char* cmd)
 {
-	cmd = skipwhite(cmd);
 	char* next = strchr(cmd, ' ');
 	int i = 0;
+	cmd = skipwhite(cmd);
+
  
 	while(next != NULL) {
 		next[0] = '\0';
